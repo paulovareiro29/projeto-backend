@@ -46,23 +46,3 @@ class User {
     }
 
 }
-
-/*$app->get('/user', function ($request){
-    require_once( __DIR__ . '\..\database\dbconnect.php');
-   
-    foreach ($db->utilizador() as $row){
-        $data[] = $row;
-    };
-
-    if(isset($data))
-        return json_encode($data, JSON_UNESCAPED_UNICODE);
-    
-    return json_encode("ERROR 404: USER", JSON_UNESCAPED_UNICODE);
-});
-
-$app->post('/user', function ($request){
-    require_once($dbconnect);
-
-    return json_encode($request->getAttribute('id'));
-
-});*/
