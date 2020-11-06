@@ -31,6 +31,9 @@ class User {
             if(!isset($body[$field])) $body[$field] = null;
         }
         
+        if(isset($body['pass']))
+            $body['pass'] = hash('md5', $body['pass']);
+
         $user = $db->utilizador();
         $result = $user->insert($body);
 
