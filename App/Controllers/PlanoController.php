@@ -2,18 +2,20 @@
 
 namespace App\Controllers;
 
-use App\DAO\Database\UserDAO;
-use App\Models\UserModel;
+use App\DAO\Database\PlanoDAO;
+use App\Models\PlanoModel;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-final class UserController {
-    
-    public function index(Request $request, Response $response, array $args): Response {
-        $userDAO = new UserDAO();
-        $users = $userDAO->getAllUsers();
+final class PlanoController {
 
-        $response->getBody()->write(json_encode($users) , JSON_UNESCAPED_UNICODE);
+    public function index(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+
+        $planos = $planoDAO->getAllPlanos();
+
+        $response->getBody()->write(json_encode($planos) , JSON_UNESCAPED_UNICODE);
 
         return $response
             ->withHeader('Content-Type', 'application/json')
@@ -21,12 +23,13 @@ final class UserController {
     }
 
     public function show(Request $request, Response $response, array $args): Response {
-        $userDAO = new UserDAO();
+        $planoDAO = new PlanoDAO();
+
         $id = $request->getAttribute('id');
 
-        $user = $userDAO->getUser($id);
+        $plano = $planoDAO->getPlano($id);
 
-        $response->getBody()->write(json_encode($user) , JSON_UNESCAPED_UNICODE);
+        $response->getBody()->write(json_encode($plano) , JSON_UNESCAPED_UNICODE);
 
         return $response
             ->withHeader('Content-Type', 'application/json')
@@ -34,21 +37,13 @@ final class UserController {
     }
 
     public function create(Request $request, Response $response, array $args): Response {
-        $userDAO = new UserDAO();
+        $planoDAO = new PlanoDAO();
 
         $body = $request->getParsedBody(); 
 
-        $fields = array(); //array dos campos do utilizador
-        $roles = array(); //array das roles do utilizador
+        $fields = array();
 
-        //loop para se a role for vazia atribuir false
-        foreach(UserModel::getRoles() as $role){ 
-            if(!isset($body[$role])) $body[$role] = 'false';
-            $roles[$role] = ($body[$role] == 'true'? true : false);
-        }
-
-        //loop para se algum campo do user for vazio atribuir null
-        foreach(UserModel::getFields() as $field){ 
+        foreach(PlanoModel::getFields() as $field){ 
             if(!isset($body[$field]) || $body[$field] == ""){
                 $fields[$field] = null;
                 continue;
@@ -56,8 +51,7 @@ final class UserController {
             $fields[$field] = $body[$field];
         }
 
-        //inserir o utilizador
-        $result = $userDAO->insert($fields, $roles); 
+        $result = $planoDAO->insert($fields); 
 
         if($result){
             $response->getBody()->write(json_encode("Registo inserido com sucesso") , JSON_UNESCAPED_UNICODE);
@@ -71,27 +65,17 @@ final class UserController {
         return $response 
                 ->withHeader('Content-Type', 'application/json')
                 ->withStatus(400);
-          
     }
 
     public function update(Request $request, Response $response, array $args): Response {
-        $userDAO = new UserDAO();
+        $planoDAO = new PlanoDAO();
 
         $body = $request->getParsedBody(); 
 
-        $fields = array(); //array dos campos do utilizador
-        $roles = array(); //array das roles do utilizador
-
+        $fields = array();
         $fields['id'] = $request->getAttribute('id');
 
-        //loop para se a role for vazia atribuir false
-        foreach(UserModel::getRoles() as $role){ 
-            if(!isset($body[$role])) $body[$role] = 'false';
-            $roles[$role] = ($body[$role] == 'true'? true : false);
-        }
-
-        //loop para se algum campo do user for vazio atribuir null
-        foreach(UserModel::getFields() as $field){ 
+        foreach(PlanoModel::getFields() as $field){ 
             if(!isset($body[$field]) || $body[$field] == ""){
                 $fields[$field] = null;
                 continue;
@@ -99,14 +83,13 @@ final class UserController {
             $fields[$field] = $body[$field];
         }
 
-
-        $result = $userDAO->update($fields, $roles);
+        $result = $planoDAO->update($fields); 
 
         if($result){
             $response->getBody()->write(json_encode("Registo atualizado com sucesso") , JSON_UNESCAPED_UNICODE);
             return $response 
                 ->withHeader('Content-Type', 'application/json')
-                ->withStatus(200);
+                ->withStatus(201);
         }
             
         
@@ -117,11 +100,12 @@ final class UserController {
     }
 
     public function delete(Request $request, Response $response, array $args): Response {
-        $userDAO = new UserDAO();  
+        $planoDAO = new PlanoDAO();
+
         $id = $request->getAttribute('id');
 
-        $result =  $userDAO->delete($id);
-
+        $result =  $planoDAO->delete($id);
+        
 
         if($result){
             $response->getBody()->write(json_encode("Registo eliminado com sucesso") , JSON_UNESCAPED_UNICODE);
@@ -135,51 +119,56 @@ final class UserController {
         return $response 
                 ->withHeader('Content-Type', 'application/json')
                 ->withStatus(400);
-
     }
-
+    
     public function associate(Request $request, Response $response, array $args): Response {
-        $userDAO = new UserDAO();
+        $planoDAO = new PlanoDAO();
 
         $body = $request->getParsedBody(); 
 
-        $result = $userDAO->associate($body);
+        $result = $planoDAO->associate($body);
 
         if($result){
-            $response->getBody()->write(json_encode("Atleta e treinador associado com sucesso") , JSON_UNESCAPED_UNICODE);
+            $response->getBody()->write(json_encode("Plano associado a atleta com sucesso") , JSON_UNESCAPED_UNICODE);
             return $response 
                 ->withHeader('Content-Type', 'application/json')
                 ->withStatus(201);
         }
             
         
-        $response->getBody()->write(json_encode("Erro ao associar atleta e treinador") , JSON_UNESCAPED_UNICODE);
+        $response->getBody()->write(json_encode("Erro ao associar plano e atleta") , JSON_UNESCAPED_UNICODE);
         return $response 
                 ->withHeader('Content-Type', 'application/json')
                 ->withStatus(400);
     }
 
-    public function dissociate(Request $request, Response $response, array $args): Response {
-        $userDAO = new UserDAO();
+    public function planosAtleta(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
 
-        $data = [
-            'atleta_id' => $request->getAttribute('id_atleta'),
-            'treinador_id' => $request->getAttribute('id_treinador')
-        ];
+        $id = $request->getAttribute('id');
 
-        $result = $userDAO->dissociate($data);
+        $planos = $planoDAO->getPlanosAtleta($id);
 
-        if($result){
-            $response->getBody()->write(json_encode("Atleta e treinador desassociados com sucesso") , JSON_UNESCAPED_UNICODE);
-            return $response 
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(201);
-        }
-            
+        $response->getBody()->write(json_encode($planos) , JSON_UNESCAPED_UNICODE);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
         
-        $response->getBody()->write(json_encode("Erro ao desassociar atleta e treinador") , JSON_UNESCAPED_UNICODE);
-        return $response 
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
+    }
+
+    public function planosTreinador(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+        $id = $request->getAttribute('id');
+
+        $planos = $planoDAO->getPlanosTreinador($id);
+
+        $response->getBody()->write(json_encode($planos) , JSON_UNESCAPED_UNICODE);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
+
     }
 }

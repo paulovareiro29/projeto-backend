@@ -1,0 +1,92 @@
+Planos -> {
+    Visualização -> {
+        O atleta so pode ver os planos associados a ele.
+        O treinador so pode ver os planos criados por ele e a que atletas está associado.
+        O administrador pode ver todos os planos.
+
+        Routes -> {
+            Atleta                      -> { GET: '/plano/atleta/{id}' }    : DONE : AUTH NOT DONE
+            Treinador                   -> { GET: '/plano/treinador/{id}' } : DONE : AUTH NOT DONE
+            Administrador               -> { GET: '/plano/' }               : DONE : AUTH NOT DONE
+            Administrador/Treinador     -> { GET: '/plano/{id}}             : DONE : AUTH NOT DONE
+        }
+    }
+
+    Criação -> {
+        O atleta nao pode criar plano de treino.
+        O treinador pode criar planos de treino.
+        O administrador pode criar planos de treino.
+
+        Routes -> {
+            Treinador       -> { POST: '/plano/'}  : DONE : AUTH NOT DONE
+            Administrador   -> { POST: '/plano/' } : DONE : AUTH NOT DONE
+        }
+    }
+
+    Editar -> {
+        O atleta nao pode editar planos de treino.
+        O treinador so pode editar os planos de treino criados por ele.
+        O administrador pode editar qualquer plano de treino.
+
+        Routes -> {
+            Treinador       -> { PUT: '/plano/{id}'}    : DONE : AUTH NOT DONE
+            Administrador   -> { PUT: '/plano/{id}' }   : DONE : AUTH NOT DONE
+        }
+    }
+
+    Eliminar -> {
+        O atleta nao pode eliminar nenhum plano de treino.
+        O treinador so pode eliminar planos de treino criados por ele.
+        O administrador pode eliminar qualquer plano de treino.
+
+        Routes -> {
+            Treinador       -> { DELETE: '/plano/{id}'}     : DONE : AUTH NOT DONE
+            Administrador   -> { DELETE: '/plano/{id}' }    : DONE : AUTH NOT DONE
+        }
+    }
+}
+
+Exercicio -> {
+    Visualizar -> {
+        Treinador/Administrador -> Visualizar todos os exercicios que existam
+
+        Routes -> {
+            Treinador       -> { GET: '/exercicio/' }
+            Administrador   -> { GET: '/exercicio/' }
+        }
+    }
+
+    Criação -> {
+        Treinador/Administrador -> Podem criar exercicios
+
+        Routes -> {
+            Treinador       -> { POST: '/exercicio/' }  
+            Administrador   -> { POST: '/exercicio/' } 
+        }
+    }
+
+    Editar -> {
+        Treinador/Administrador -> Podem editar exercicios
+
+        Routes -> {
+            Treinador       -> { PUT: '/exercicio/{id}'}    
+            Administrador   -> { PUT: '/exercicio/{id}' }   
+        }
+    }
+
+    Eliminar -> {
+        Treinador/Administrador -> Podem eliminar exercicios
+
+
+        Routes -> {
+            Treinador       -> { DELETE: '/exercicio/{id}' }     
+            Administrador   -> { DELETE: '/exercicio/{id}' }    
+        }
+    }
+}
+
+Blocos -> {
+    Visualizar -> {
+        Quando visualizar um bloco de treino vai mostrar todos os bloco exercicio.
+    }
+}

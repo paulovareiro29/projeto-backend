@@ -15,4 +15,19 @@ class AuthMiddleware {
         return $response;
     }
 
+    public function isAtleta(Request $request, Response $response, $next){
+        //POR FAZER
+        $response = $next($request,$response);
+
+        return $response;
+    }
+
+    public function isTreinador(Request $request, Response $response, $next){
+        //POR FAZER
+        $response = $next($request,$response);
+
+        return $response;
+    }
+
+
 }
