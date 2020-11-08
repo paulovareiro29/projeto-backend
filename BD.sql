@@ -57,6 +57,8 @@ CREATE TABLE plano(
     treinador_id INT NOT NULL,
     nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(255),
+    data_inicial DATE, 
+    data_final DATE,
     PRIMARY KEY (id),
     CONSTRAINT FK_TREINADOR_PLANO
         FOREIGN KEY (treinador_id)
@@ -66,8 +68,6 @@ CREATE TABLE plano(
 CREATE TABLE planoAtleta(
     plano_id INT NOT NULL,
     atleta_id INT NOT NULL,
-    data_inicial DATE, 
-    data_final DATE,
     PRIMARY KEY (plano_id, atleta_id),
     CONSTRAINT FK_PLANO_PLANOATLETA
         FOREIGN KEY (plano_id)

@@ -98,9 +98,9 @@ class UserDAO extends Connection {
     public function delete($id): bool{
         $user = $this->db->utilizador[$id];
 
-        if($this->isAdmin($id)) $this->db->administrador()->where('utilizador_id', $id)->delete();
-        if($this->isAtleta($id)) $this->db->atleta()->where('utilizador_id', $id)->delete();
-        if($this->isTreinador($id)) $this->db->treinador()->where('utilizador_id', $id)->delete();
+        $this->db->administrador()->where('utilizador_id', $id)->delete();
+        $this->db->atleta()->where('utilizador_id', $id)->delete();
+        $this->db->treinador()->where('utilizador_id', $id)->delete();
 
         $result = $user->delete();
 
@@ -120,7 +120,7 @@ class UserDAO extends Connection {
         ];
 
         $result = $this->db->atletatreinador()->insert($data);
-        return true;
+        return $result;
     }
 
     public function dissociate($data){
