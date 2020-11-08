@@ -13,6 +13,7 @@ CREATE TABLE utilizador (
 CREATE TABLE administrador(
     id INT NOT NULL AUTO_INCREMENT,
     utilizador_id INT NOT NULL,
+    active BOOLEAN NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT FK_UTILIZADOR_ADMIN
         FOREIGN KEY (utilizador_id)
@@ -22,6 +23,7 @@ CREATE TABLE administrador(
 CREATE TABLE atleta(
     id INT NOT NULL AUTO_INCREMENT,
     utilizador_id INT NOT NULL,
+    active BOOLEAN NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT FK_UTILIZADOR_ATLETA
         FOREIGN KEY (utilizador_id)
@@ -31,6 +33,7 @@ CREATE TABLE atleta(
 CREATE TABLE treinador(
     id INT NOT NULL AUTO_INCREMENT,
     utilizador_id INT NOT NULL,
+    active BOOLEAN NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT FK_UTILIZADOR_TREINADOR
         FOREIGN KEY (utilizador_id)

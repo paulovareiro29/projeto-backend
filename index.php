@@ -1,25 +1,13 @@
 <?php
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
 
-require __DIR__ . '/vendor/autoload.php';
+require_once './vendor/autoload.php';
+require_once './env.php';
+require_once './src/slimConfiguration.php';
+require_once './routes/index.php';
 
-$configuration = [
-    'settings' => [
-        'displayErrorDetails' => true,
-    ],
-];
-$c = new \Slim\Container($configuration);
 
-$app = new \Slim\App($c);
 
-require_once('api/routes/user.php');
 
-$app->get('/', function ($request) {
-    return "API projeto backend";
-});
-
-$app->run();
 ?>
 
 
