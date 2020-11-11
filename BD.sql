@@ -80,7 +80,7 @@ CREATE TABLE planoAtleta(
 CREATE TABLE bloco(
     id INT NOT NULL AUTO_INCREMENT,
     plano_id INT NOT NULL,
-    ordem INT NOT NULL,
+    dia INT NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT FK_PLANO_BLOCO
         FOREIGN KEY (plano_id)

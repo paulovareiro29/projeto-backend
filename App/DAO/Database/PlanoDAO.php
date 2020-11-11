@@ -21,7 +21,8 @@ class PlanoDAO extends Connection {
                    'nome' => $plano['nome'],
                    'descricao' => $plano['descricao'],
                    'data_inicial' => $plano['data_inicial'],
-                   'data_final' => $plano['data_final']
+                   'data_final' => $plano['data_final'],
+                   'blocos' => $this->getBlocos($plano['id'])
                ]);
         }
 
@@ -29,23 +30,27 @@ class PlanoDAO extends Connection {
         return $data;
     }
 
-    public function getPlano($id){
+    public function getBlocos($id){
         $data = array();
 
-        foreach ($this->db->plano()->where('id', $id) as $plano){
-
-               array_push($data,[
-                   'id' => $plano['id'],
-                   'treinador' => $plano['treinador_id'],
-                   'nome' => $plano['nome'],
-                   'descricao' => $plano['descricao'],
-                   'data_inicial' => $plano['data_inicial'],
-                   'data_final' => $plano['data_final']
-               ]);
+        foreach($this->db->bloco()->where('plano_id', $id) as $bloco){
+            array_push($data, $this->showBloco($bloco['id']));
         }
 
-
         return $data;
+    }
+
+    public function getPlano($id){
+        foreach ($this->db->plano()->where('id',$id) as $plano){
+            return [
+                'id' => $plano['id'],
+                'treinador' => $plano['treinador_id'],
+                'nome' => $plano['nome'],
+                'descricao' => $plano['descricao'],
+                'data_inicial' => $plano['data_inicial'],
+                'data_final' => $plano['data_final'],
+                'blocos' => $this->getBlocos($plano['id'])];
+        }
     }
 
     public function insert($data): bool{
@@ -58,6 +63,13 @@ class PlanoDAO extends Connection {
         $id = $this->db->plano()->insert($data);
 
         if(!$id) return false;
+
+        for ($i = 0; $i < 7; $i++) {
+            $this->db->bloco()->insert([
+                'plano_id' => $id,
+                'dia' => $i
+            ]);
+        }
 
         return true;
     }
@@ -99,6 +111,38 @@ class PlanoDAO extends Connection {
 
         $result = $this->db->planoatleta()->insert($data);
         return $result;
+    }
+
+    public function addExercise($data){
+        $result = $this->db->blocoexercicio()->insert($data);
+        return $result;
+    }
+
+    public function getBloco($data){
+        foreach($this->db->bloco()->where('plano_id', $data['plano_id'])->and('dia',$data['dia']) as $bloco){
+            return $bloco['id'];
+        }
+
+        return false;
+    }
+
+    public function showBloco($id){
+        $exercicioDAO = new ExercicioDAO();
+
+        $data = array();
+
+        foreach($this->db->blocoexercicio()->where('bloco_id', $id) as $exercicio){
+            array_push($data,[
+                'exercicio' => $exercicioDAO->get($exercicio['exercicio_id']),
+                'series' => $exercicio['series'],
+                'repeticoes' => $exercicio['repeticoes'],
+                'carga' => $exercicio['carga'],
+                'tempo_distancia' => $exercicio['tempo_distancia'],
+                'realizado' => $exercicio['realizado'] == 1 ? true : false
+            ]);
+        }
+
+        return $data;
     }
 
     public function getPlanosAtleta($id){

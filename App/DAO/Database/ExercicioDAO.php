@@ -32,14 +32,13 @@ class ExercicioDAO extends Connection {
         foreach ($this->db->exercicio()->where('id',$id) as $exercicio){
             $tipoExercicio_id = $exercicio['tipoExercicio_id'];
 
-               array_push($data,[
+               return [
                    'id' => $exercicio['id'],
                    'nome' => $exercicio['nome'],
                    'descricao' => $exercicio['descricao'],
                    'tipo' => isset($tipoExercicio_id) ? $this->getTipoExercicio($tipoExercicio_id) : null,
-               ]);
+               ];
         }
-
 
         return $data;
     }
@@ -88,19 +87,7 @@ class ExercicioDAO extends Connection {
     }
 
     public function getTipoExercicio($id){
-        $data = array();
-
-        foreach ($this->db->tipoexercicio()->where('id',$id) as $exercicio){
-
-               array_push($data,[
-                   'id' => $exercicio['id'],
-                   'nome' => $exercicio['nome'],
-                   'descricao' => $exercicio['descricao'],
-               ]);
-        }
-
-
-        return $data;
+        return $this->db->tipoexercicio[$id];
     }
 
     public function insertTipoExercicio($data): bool{

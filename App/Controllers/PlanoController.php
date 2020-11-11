@@ -142,6 +142,73 @@ final class PlanoController {
                 ->withStatus(400);
     }
 
+    public function addExercise(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+        $body = $request->getParsedBody();
+
+        $id = $request->getAttribute('id');
+
+        $dia = (!isset($body['dia']) || $body['dia'] == "") ? null : $body['dia'];
+        
+        if(!isset($dia))
+            return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(400);
+        
+
+        $fields = array();
+        
+        $bloco = $planoDAO->getBloco([
+            'plano_id' => $id, 
+            'dia' => $dia]);
+            
+        $fields['bloco_id'] = $bloco;       
+        $fields['realizado'] = false;
+
+        foreach(PlanoModel::getFieldsBlocoExercicio() as $field){ 
+            if(!isset($body[$field]) || $body[$field] == ""){
+                $fields[$field] = null;
+                continue;
+            }
+            $fields[$field] = $body[$field];
+        }
+
+        $result = $planoDAO->addExercise($fields);
+
+        if($result){
+            $response->getBody()->write(json_encode("Exercicio adicionado ao plano com sucesso") , JSON_UNESCAPED_UNICODE);
+            return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(201);
+        }
+            
+        
+        $response->getBody()->write(json_encode("Erro ao adicionar exercicio ao plano") , JSON_UNESCAPED_UNICODE);
+        return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(400);
+
+    }
+
+    public function showBloco(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+        $plano_id = $request->getAttribute('id');
+        $dia = $request->getAttribute('dia');
+        
+        $bloco = $planoDAO->getBloco([
+            'plano_id' => $plano_id, 
+            'dia' => $dia]);
+
+        $result = $planoDAO->showBloco($bloco);
+
+        $response->getBody()->write(json_encode($result) , JSON_UNESCAPED_UNICODE);
+        return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(200);
+    }
+
     public function planosAtleta(Request $request, Response $response, array $args): Response {
         $planoDAO = new PlanoDAO();
 

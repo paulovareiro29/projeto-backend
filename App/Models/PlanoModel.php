@@ -14,5 +14,14 @@ final class PlanoModel {
         ];
     }
 
+    public static function getFieldsBlocoExercicio(): array {
+        return [
+            'exercicio_id',
+            'series',
+            'repeticoes',
+            'carga',
+            'tempo_distancia',
+        ];
+    }
 
 }

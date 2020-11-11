@@ -39,15 +39,13 @@ class UserDAO extends Connection {
     }
 
     public function getUser($id): array{
-        $data = array();
-
         foreach ($this->db->utilizador()
                                 ->where('id', $id) as $user){
             $admin = $this->isAdmin($user['id']);
             $atleta = $this->isAtleta($user['id']);
             $treinador = $this->isTreinador($user['id']);
 
-            array_push($data,[
+            return [
                 'id' => $user['id'],
                 'username' => $user['username'],
                 'pass' => $user['pass'],
@@ -61,10 +59,8 @@ class UserDAO extends Connection {
                 ],
                 'treinadores' => $this->getAssociatedTreinadores($user['id']),
                 'atletas' => $this->getAssociatedAtletas($user['id'])
-            ]);
+            ];
         }
-
-        return $data;
     }
 
     public function insert($user, $roles): bool{
