@@ -63,6 +63,16 @@ class UserDAO extends Connection {
         }
     }
 
+    public function login($body){
+        foreach($this->db->utilizador()->where('username', $body['username']) as $user){
+            if($user['pass'] == $body['password']){
+                return  bin2hex(openssl_random_pseudo_bytes(16));
+            }
+        }
+
+        return null;
+    }
+
     public function insert($user, $roles): bool{
         $id = $this->db->utilizador()->insert($user);
 

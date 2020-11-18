@@ -11,6 +11,7 @@ use function src\slimConfiguration;
 $app = new \Slim\App(slimConfiguration());
 
 // --------------------------------------
+$app->post('/login', UserController::class . ':login');
 
 $app->group('/user', function() use ($app){
     $app->get('/', UserController::class . ':index');

@@ -33,6 +33,19 @@ final class UserController {
             ->withStatus(200);
     }
 
+    public function login(Request $request, Response $response, array $args): Response {
+        $userDAO = new UserDAO();
+        $body = $request->getParsedBody();
+
+        $token = $userDAO->login($body);
+
+        $response->getBody()->write(json_encode(['token' => $token]) , JSON_UNESCAPED_UNICODE);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
+    }
+
     public function create(Request $request, Response $response, array $args): Response {
         $userDAO = new UserDAO();
 
