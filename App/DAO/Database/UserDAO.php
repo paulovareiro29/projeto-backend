@@ -65,11 +65,40 @@ class UserDAO extends Connection {
 
     public function login($body){
         foreach($this->db->utilizador()->where('username', $body['username']) as $user){
-            if($user['pass'] == $body['password']){
-                return  bin2hex(openssl_random_pseudo_bytes(16));
+            if($user['pass'] == $body['pass']){
+                $token = bin2hex(openssl_random_pseudo_bytes(16));
+
+                $user->update(['access_token' => $token]);
+                return $token;
             }
         }
 
+        return null;
+    }
+
+    public function getUserByToken($token){
+        foreach($this->db->utilizador()->where('access_token', $token) as $user){
+            $admin = $this->isAdmin($user['id']);
+            $atleta = $this->isAtleta($user['id']);
+            $treinador = $this->isTreinador($user['id']);
+
+            return [
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'pass' => $user['pass'],
+                'nome' => $user['nome'],
+                'email' => $user['email'],
+                'morada' => $user['morada'],
+                'roles' => [
+                    'admin' => $admin,
+                    'atleta' => $atleta,
+                    'treinador' => $treinador
+                ],
+                'treinadores' => $this->getAssociatedTreinadores($user['id']),
+                'atletas' => $this->getAssociatedAtletas($user['id'])
+            ];
+        }
+        
         return null;
     }
 
@@ -85,14 +114,24 @@ class UserDAO extends Connection {
         return true;
     }
 
-    public function update($user, $roles): bool{
-        $utilizador = $this->db->utilizador()->where('id', $user['id']);
+    public function update($user, $roles){
+        $utilizador = $this->db->utilizador[$user['id']];
         $admin =  $this->db->administrador()->where('utilizador_id', $user['id']);
         $atleta = $this->db->atleta()->where('utilizador_id', $user['id']);
         $treinador =  $this->db->treinador()->where('utilizador_id', $user['id']);
 
         if(!$utilizador) return false;
 
+        $user['pass'] = $utilizador['pass'];
+
+        /*$body = [
+            'username' => $user['username'],
+            'pass' => $utilizador['pass'],
+            'nome' => $user['nome'],
+            'morada' => $user['morada'],
+            'email' => $user['email'],
+        ];
+*/
         $utilizador->update($user);
         $admin->update(['active' => $roles['admin']]);
         $atleta->update(['active' => $roles['atleta']]);

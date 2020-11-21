@@ -33,6 +33,19 @@ final class UserController {
             ->withStatus(200);
     }
 
+    public function getByToken(Request $request, Response $response, array $args): Response {
+        $userDAO = new UserDAO();
+        $token = $request->getAttribute('token');
+
+        $user = $userDAO->getUserByToken($token);
+
+        $response->getBody()->write(json_encode($user) , JSON_UNESCAPED_UNICODE);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
+    }
+
     public function login(Request $request, Response $response, array $args): Response {
         $userDAO = new UserDAO();
         $body = $request->getParsedBody();
@@ -106,7 +119,7 @@ final class UserController {
         //loop para se algum campo do user for vazio atribuir null
         foreach(UserModel::getFields() as $field){ 
             if(!isset($body[$field]) || $body[$field] == ""){
-                $fields[$field] = null;
+                //s$fields[$field] = null;
                 continue;
             }
             $fields[$field] = $body[$field];

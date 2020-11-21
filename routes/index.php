@@ -13,11 +13,12 @@ $app = new \Slim\App(slimConfiguration());
 // --------------------------------------
 $app->post('/login', UserController::class . ':login');
 
+
 $app->group('/user', function() use ($app){
     $app->get('/', UserController::class . ':index');
     $app->get('/{id}', UserController::class . ':show');
     $app->put('/{id}', UserController::class . ':update');
-
+    $app->get('/token/{token}', UserController::class . ':getByToken');
     $app->group('', function() use ($app){
         $app->post('/', UserController::class . ':create');
     
