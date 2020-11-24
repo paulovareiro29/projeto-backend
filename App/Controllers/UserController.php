@@ -33,6 +33,58 @@ final class UserController {
             ->withStatus(200);
     }
 
+    public function updateByToken(Request $request, Response $response, array $args): Response {
+        $userDAO = new UserDAO();
+
+        $body = $request->getParsedBody(); 
+
+        $token = $request->getAttribute('token');
+
+        $user = $userDAO->getUserByToken($token);
+
+        if(isset($user)){
+            $fields = array(); //array dos campos do utilizador
+            $roles = array(); //array das roles do utilizador
+
+            $fields['id'] = $user['id'];
+
+            //loop para se a role for vazia atribuir false
+            foreach(UserModel::getRoles() as $role){ 
+                if(!isset($body[$role])) $body[$role] = 'false';
+                $roles[$role] = ($body[$role] == 'true'? true : false);
+            }
+    
+            //loop para se algum campo do user for vazio atribuir null
+            foreach(UserModel::getFields() as $field){ 
+                if(!isset($body[$field]) || $body[$field] == ""){
+                    //$fields[$field] = null;
+                    continue;
+                }
+                $fields[$field] = $body[$field];
+            }
+
+            $result = $userDAO->update($fields, $roles);
+
+            if($result){
+                $response->getBody()->write(json_encode("Registo atualizado com sucesso") , JSON_UNESCAPED_UNICODE);
+                return $response 
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(200);
+            }
+                
+            
+            $response->getBody()->write(json_encode("Erro ao atualizar registo") , JSON_UNESCAPED_UNICODE);
+            return $response 
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(400);
+        }
+
+        $response->getBody()->write(json_encode("Erro ao atualizar registo") , JSON_UNESCAPED_UNICODE);
+            return $response 
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(400);
+    }
+
     public function getByToken(Request $request, Response $response, array $args): Response {
         $userDAO = new UserDAO();
         $token = $request->getAttribute('token');

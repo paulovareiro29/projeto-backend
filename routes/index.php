@@ -19,6 +19,7 @@ $app->group('/user', function() use ($app){
     $app->get('/{id}', UserController::class . ':show');
     $app->put('/{id}', UserController::class . ':update');
     $app->get('/token/{token}', UserController::class . ':getByToken');
+    $app->put('/token/{token}', UserController::class . ':updateByToken');
     $app->group('', function() use ($app){
         $app->post('/', UserController::class . ':create');
     
