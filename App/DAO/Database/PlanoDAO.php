@@ -136,6 +136,8 @@ class PlanoDAO extends Connection {
 
         foreach($this->db->blocoexercicio()->where('bloco_id', $id) as $exercicio){
             array_push($data,[
+                'bloco_id' => $exercicio['bloco_id'],
+                'exercicio_id' => $exercicio['exercicio_id'],
                 'exercicio' => $exercicioDAO->get($exercicio['exercicio_id']),
                 'series' => $exercicio['series'],
                 'repeticoes' => $exercicio['repeticoes'],
