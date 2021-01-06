@@ -33,7 +33,7 @@ $app->group('/user', function() use ($app){
 //plano
 $app->group('/plano', function() use($app){
 
-    $app->get('/{id}/{dia}', PlanoController::class . ':showBloco');
+    $app->get('/{id}/bloco/{dia}', PlanoController::class . ':showBloco');
 
     //atletas/admins
     $app->group('', function () use ($app){
@@ -46,6 +46,7 @@ $app->group('/plano', function() use($app){
     $app->group('', function() use ($app){
         $app->get('/{id}', PlanoController::class . ':show');
         $app->get('/treinador/{id}', PlanoController::class . ':planosTreinador');
+        $app->get('/{id}/atletas', PlanoController::class . ':atletasAssociadosPlano');
         $app->post('/', PlanoController::class . ':create');
         $app->post('/associate', PlanoController::class . ':associate');
         $app->post('/{id}/add', PlanoController::class . ':addExercise');

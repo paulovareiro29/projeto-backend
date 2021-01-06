@@ -238,4 +238,19 @@ final class PlanoController {
             ->withStatus(200);
 
     }
+
+    public function atletasAssociadosPlano(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+        $id = $request->getAttribute('id');
+
+        $atletas = $planoDAO->getAtletasAssociados($id);
+
+        $response->getBody()->write(json_encode($atletas) , JSON_UNESCAPED_UNICODE);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
+
+    }
 }

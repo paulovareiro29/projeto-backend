@@ -22,6 +22,7 @@ class PlanoDAO extends Connection {
                    'descricao' => $plano['descricao'],
                    'data_inicial' => $plano['data_inicial'],
                    'data_final' => $plano['data_final'],
+                   'atletas_associados' => $this->getAtletasAssociados($plano['id']),
                    'blocos' => $this->getBlocos($plano['id'])
                ]);
         }
@@ -42,6 +43,7 @@ class PlanoDAO extends Connection {
 
     public function getPlano($id){
         foreach ($this->db->plano()->where('id',$id) as $plano){
+
             return [
                 'id' => $plano['id'],
                 'treinador' => $plano['treinador_id'],
@@ -49,6 +51,7 @@ class PlanoDAO extends Connection {
                 'descricao' => $plano['descricao'],
                 'data_inicial' => $plano['data_inicial'],
                 'data_final' => $plano['data_final'],
+                'atletas_associados' => $this->getAtletasAssociados($plano['id']),
                 'blocos' => $this->getBlocos($plano['id'])];
         }
     }
@@ -155,14 +158,15 @@ class PlanoDAO extends Connection {
         foreach ($this->db->planoatleta()->where('atleta_id', $id) as $row){
             foreach($this->db->plano()->where('id',$row['plano_id']) as $plano){
 
-                array_push($data,[
+                return [
                     'id' => $plano['id'],
                     'treinador' => $plano['treinador_id'],
                     'nome' => $plano['nome'],
                     'descricao' => $plano['descricao'],
                     'data_inicial' => $plano['data_inicial'],
-                    'data_final' => $plano['data_final']
-                ]);
+                    'data_final' => $plano['data_final'],
+                    'atletas_associados' => $this->getAtletasAssociados($plano['id']),
+                    'blocos' => $this->getBlocos($plano['id'])];
             }     
         }
 
@@ -187,7 +191,9 @@ class PlanoDAO extends Connection {
                 'nome' => $plano['nome'],
                 'descricao' => $plano['descricao'],
                 'data_inicial' => $plano['data_inicial'],
-                'data_final' => $plano['data_final']
+                'data_final' => $plano['data_final'],
+                'atletas_associados' => $this->getAtletasAssociados($plano['id']),
+                'blocos' => $this->getBlocos($plano['id'])
             ]);
         }     
 
@@ -195,4 +201,15 @@ class PlanoDAO extends Connection {
         return $data;
     } 
 
+    public function getAtletasAssociados($id){
+        $userDAO = new UserDAO();
+
+        $data = array();
+
+        foreach($this->db->planoatleta()->where('plano_id', $id) as $plano){
+            array_push($data,$userDAO->getUser($plano['atleta_id']));
+        }
+
+        return $data;
+    }
 }
