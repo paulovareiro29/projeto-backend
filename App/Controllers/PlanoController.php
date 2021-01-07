@@ -53,9 +53,6 @@ final class PlanoController {
 
         $result = $planoDAO->insert($fields); 
 
-        
-
-
         if($result){
             $response->getBody()->write(json_encode("Registo inserido com sucesso") , JSON_UNESCAPED_UNICODE);
             return $response 
@@ -80,7 +77,7 @@ final class PlanoController {
 
         foreach(PlanoModel::getFields() as $field){ 
             if(!isset($body[$field]) || $body[$field] == ""){
-                $fields[$field] = null;
+                //$fields[$field] = null;
                 continue;
             }
             $fields[$field] = $body[$field];
@@ -151,20 +148,12 @@ final class PlanoController {
         $body = $request->getParsedBody();
 
         $id = $request->getAttribute('id');
-
-        $dia = (!isset($body['dia']) || $body['dia'] == "") ? null : $body['dia'];
         
-        if(!isset($dia))
-            return $response 
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
-        
-
         $fields = array();
         
         $bloco = $planoDAO->getBloco([
             'plano_id' => $id, 
-            'dia' => $dia]);
+            'dia' => $body['dia']]);
             
         $fields['bloco_id'] = $bloco;       
         $fields['realizado'] = false;
@@ -255,5 +244,50 @@ final class PlanoController {
             ->withHeader('Content-Type', 'application/json')
             ->withStatus(200);
 
+    }
+
+    public function updateExercise(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+        $body = $request->getParsedBody(); 
+        $bloco = $request->getAttribute('bloco');
+        $exercicio = $request->getAttribute('exercicio');
+
+        $result = $planoDAO->updateExercise($bloco,$exercicio,$body);
+
+        if($result){
+            $response->getBody()->write(json_encode("Sucesso ao atualizar exercicio") , JSON_UNESCAPED_UNICODE);
+            return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(201);
+        }
+            
+        
+        $response->getBody()->write(json_encode("Erro ao atualizar exercicio") , JSON_UNESCAPED_UNICODE);
+        return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(200);
+    }
+
+    public function deleteExercise(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+        $bloco = $request->getAttribute('bloco');
+        $exercicio = $request->getAttribute('exercicio');
+
+        $result = $planoDAO->deleteExercise($bloco,$exercicio);
+
+        if($result){
+            $response->getBody()->write(json_encode("Sucesso ao eliminar exercicio") , JSON_UNESCAPED_UNICODE);
+            return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(201);
+        }
+            
+        
+        $response->getBody()->write(json_encode("Erro ao eliminar exercicio") , JSON_UNESCAPED_UNICODE);
+        return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(200);
     }
 }

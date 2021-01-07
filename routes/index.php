@@ -13,6 +13,7 @@ $app = new \Slim\App(slimConfiguration());
 // --------------------------------------
 $app->post('/login', UserController::class . ':login');
 
+$app->put('/plano/blocoexercicio/{bloco}/{exercicio}', PlanoController::class . ':updateExercise');
 
 $app->group('/user', function() use ($app){
     $app->get('/', UserController::class . ':index');
@@ -53,6 +54,7 @@ $app->group('/plano', function() use($app){
 
         $app->put('/{id}', PlanoController::class . ':update');
         $app->delete('/{id}', PlanoController::class . ':delete');
+        $app->delete('/blocoexercicio/{bloco}/{exercicio}', PlanoController::class . ':deleteExercise');
     })->add(AuthMiddleware::class . ':isTreinador');
 
 

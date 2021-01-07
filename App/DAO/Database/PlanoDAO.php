@@ -233,9 +233,25 @@ class PlanoDAO extends Connection {
         $data = array();
 
         foreach($this->db->planoatleta()->where('plano_id', $id) as $plano){
-            array_push($data,$userDAO->getUser($plano['atleta_id']));
+            $userID = $userDAO->getAtleta($plano['atleta_id'])['utilizador_id'];
+
+            array_push($data,$userDAO->getUser($userID));
         }
 
         return $data;
+    }
+
+    public function updateExercise($bloco, $exercicio, $data){
+        return $this->db->blocoexercicio()
+            ->where("bloco_id",$bloco)
+            ->where("exercicio_id",$exercicio)
+            ->update($data);
+    }
+
+    public function deleteExercise($bloco, $exercicio){
+        return $this->db->blocoexercicio()
+            ->where("bloco_id",$bloco)
+            ->where("exercicio_id",$exercicio)
+            ->delete();
     }
 }
