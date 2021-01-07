@@ -15,6 +15,10 @@ class PlanoDAO extends Connection {
 
         foreach ($this->db->plano() as $plano){
 
+            $from=date_create($plano['data_inicial']);
+            $to=date_create($plano['data_final']);
+            $days=date_diff($to,$from)->days;
+            
                array_push($data,[
                    'id' => $plano['id'],
                    'treinador' => $plano['treinador_id'],
@@ -22,6 +26,7 @@ class PlanoDAO extends Connection {
                    'descricao' => $plano['descricao'],
                    'data_inicial' => $plano['data_inicial'],
                    'data_final' => $plano['data_final'],
+                   'dias' => $days,
                    'atletas_associados' => $this->getAtletasAssociados($plano['id']),
                    'blocos' => $this->getBlocos($plano['id'])
                ]);
@@ -44,6 +49,10 @@ class PlanoDAO extends Connection {
     public function getPlano($id){
         foreach ($this->db->plano()->where('id',$id) as $plano){
 
+            $from=date_create($plano['data_inicial']);
+            $to=date_create($plano['data_final']);
+            $days=date_diff($to,$from)->days;
+
             return [
                 'id' => $plano['id'],
                 'treinador' => $plano['treinador_id'],
@@ -51,6 +60,7 @@ class PlanoDAO extends Connection {
                 'descricao' => $plano['descricao'],
                 'data_inicial' => $plano['data_inicial'],
                 'data_final' => $plano['data_final'],
+                'dias' => $days,
                 'atletas_associados' => $this->getAtletasAssociados($plano['id']),
                 'blocos' => $this->getBlocos($plano['id'])];
         }
@@ -67,7 +77,11 @@ class PlanoDAO extends Connection {
 
         if(!$id) return false;
 
-        for ($i = 0; $i < 7; $i++) {
+        $from=date_create($data['data_inicial']);
+        $to=date_create($data['data_final']);
+        $days=date_diff($to,$from)->days;
+
+        for ($i = 0; $i < $days; $i++) {
             $this->db->bloco()->insert([
                 'plano_id' => $id,
                 'dia' => $i
@@ -160,6 +174,10 @@ class PlanoDAO extends Connection {
         foreach ($this->db->planoatleta()->where('atleta_id', $id) as $row){
             foreach($this->db->plano()->where('id',$row['plano_id']) as $plano){
 
+                $from=date_create($plano['data_inicial']);
+                $to=date_create($plano['data_final']);
+                $days=date_diff($to,$from)->days;
+
                 return [
                     'id' => $plano['id'],
                     'treinador' => $plano['treinador_id'],
@@ -167,6 +185,7 @@ class PlanoDAO extends Connection {
                     'descricao' => $plano['descricao'],
                     'data_inicial' => $plano['data_inicial'],
                     'data_final' => $plano['data_final'],
+                    'dias' => $days,
                     'atletas_associados' => $this->getAtletasAssociados($plano['id']),
                     'blocos' => $this->getBlocos($plano['id'])];
             }     
@@ -187,6 +206,10 @@ class PlanoDAO extends Connection {
 
         foreach($this->db->plano()->where('treinador_id',$treinador_id) as $plano){
 
+            $from=date_create($plano['data_inicial']);
+            $to=date_create($plano['data_final']);
+            $days=date_diff($to,$from)->days;
+
             array_push($data,[
                 'id' => $plano['id'],
                 'treinador' => $plano['treinador_id'],
@@ -194,6 +217,7 @@ class PlanoDAO extends Connection {
                 'descricao' => $plano['descricao'],
                 'data_inicial' => $plano['data_inicial'],
                 'data_final' => $plano['data_final'],
+                'dias' => $days,
                 'atletas_associados' => $this->getAtletasAssociados($plano['id']),
                 'blocos' => $this->getBlocos($plano['id'])
             ]);

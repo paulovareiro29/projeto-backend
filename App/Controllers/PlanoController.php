@@ -53,6 +53,9 @@ final class PlanoController {
 
         $result = $planoDAO->insert($fields); 
 
+        
+
+
         if($result){
             $response->getBody()->write(json_encode("Registo inserido com sucesso") , JSON_UNESCAPED_UNICODE);
             return $response 
