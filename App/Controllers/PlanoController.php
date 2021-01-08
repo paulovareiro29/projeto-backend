@@ -290,4 +290,17 @@ final class PlanoController {
                 ->withHeader('Content-Type', 'application/json')
                 ->withStatus(200);
     }
+
+    public function duplicate(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+        $body = $request->getParsedBody();
+
+        $result = $planoDAO->duplicate($body['id']);
+
+        $response->getBody()->write(json_encode($result) , JSON_UNESCAPED_UNICODE);
+        return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(200);
+    }
 }

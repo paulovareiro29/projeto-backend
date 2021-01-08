@@ -51,6 +51,7 @@ $app->group('/plano', function() use($app){
         $app->post('/', PlanoController::class . ':create');
         $app->post('/associate', PlanoController::class . ':associate');
         $app->post('/{id}/add', PlanoController::class . ':addExercise');
+        $app->post('/duplicate', PlanoController::class . ':duplicate');
 
         $app->put('/{id}', PlanoController::class . ':update');
         $app->delete('/{id}', PlanoController::class . ':delete');

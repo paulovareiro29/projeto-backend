@@ -171,14 +171,16 @@ class PlanoDAO extends Connection {
 
         $data = array();
 
-        foreach ($this->db->planoatleta()->where('atleta_id', $id) as $row){
+        $userID = $this->db->atleta("utilizador_id = ?", $id)->fetch()['id'];
+
+        foreach ($this->db->planoatleta()->where('atleta_id', $userID) as $row){
             foreach($this->db->plano()->where('id',$row['plano_id']) as $plano){
 
                 $from=date_create($plano['data_inicial']);
                 $to=date_create($plano['data_final']);
                 $days=date_diff($to,$from)->days;
 
-                return [
+                array_push($data,[
                     'id' => $plano['id'],
                     'treinador' => $plano['treinador_id'],
                     'nome' => $plano['nome'],
@@ -187,7 +189,8 @@ class PlanoDAO extends Connection {
                     'data_final' => $plano['data_final'],
                     'dias' => $days,
                     'atletas_associados' => $this->getAtletasAssociados($plano['id']),
-                    'blocos' => $this->getBlocos($plano['id'])];
+                    'blocos' => $this->getBlocos($plano['id'])]
+                );
             }     
         }
 
@@ -253,5 +256,22 @@ class PlanoDAO extends Connection {
             ->where("bloco_id",$bloco)
             ->where("exercicio_id",$exercicio)
             ->delete();
+    }
+
+    public function duplicate($id){
+        $old_plano = $this->getPlano($id);
+
+        $from=date_create($old_plano['data_inicial']);
+        $to=date_create($old_plano['data_final']);
+        $days=date_diff($to,$from)->days;
+
+        for ($i = 0; $i < $days; $i++) {
+            $this->db->bloco()->insert([
+                'plano_id' => $id,
+                'dia' => $i
+            ]);
+        }
+
+        return ;
     }
 }
