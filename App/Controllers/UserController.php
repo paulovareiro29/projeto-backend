@@ -164,7 +164,7 @@ final class UserController {
 
         //loop para se a role for vazia atribuir false
         foreach(UserModel::getRoles() as $role){ 
-            if(!isset($body[$role])) $body[$role] = 'false';
+            if(!isset($body[$role])) continue;
             $roles[$role] = ($body[$role] == 'true'? true : false);
         }
 
@@ -240,12 +240,9 @@ final class UserController {
     public function dissociate(Request $request, Response $response, array $args): Response {
         $userDAO = new UserDAO();
 
-        $data = [
-            'atleta_id' => $request->getAttribute('id_atleta'),
-            'treinador_id' => $request->getAttribute('id_treinador')
-        ];
+        $body = $request->getParsedBody(); 
 
-        $result = $userDAO->dissociate($data);
+        $result = $userDAO->dissociate($body);
 
         if($result){
             $response->getBody()->write(json_encode("Atleta e treinador desassociados com sucesso") , JSON_UNESCAPED_UNICODE);

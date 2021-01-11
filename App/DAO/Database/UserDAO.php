@@ -2,51 +2,58 @@
 
 namespace App\DAO\Database;
 
-class UserDAO extends Connection {
+class UserDAO extends Connection
+{
 
     public function __construct()
     {
         parent::__construct();
     }
 
-    public function getAllUsers(): array{
+    public function getAllUsers(): array
+    {
         $data = array();
 
-        foreach ($this->db->utilizador() as $user){
+        foreach ($this->db->utilizador() as $user) {
             $admin = $this->isAdmin($user['id']);
             $atleta = $this->isAtleta($user['id']);
             $treinador = $this->isTreinador($user['id']);
 
-               array_push($data,[
-                   'id' => $user['id'],
-                   'username' => $user['username'],
-                   'pass' => $user['pass'],
-                   'nome' => $user['nome'],
-                   'email' => $user['email'],
-                   'morada' => $user['morada'],
-                   'roles' => [
-                       'admin' => $admin,
-                       'atleta' => $atleta,
-                       'treinador' => $treinador
-                   ],
-                   'treinadores' => $this->getAssociatedTreinadores($user['id']),
-                   'atletas' => $this->getAssociatedAtletas($user['id'])
-               ]);
+            array_push($data, [
+                'id' => $user['id'],
+                'atleta_id' => $this->db->atleta('utilizador_id = ?', $user['id'])->fetch()['id'],
+                'treinador_id' => $this->db->treinador('utilizador_id = ?', $user['id'])->fetch()['id'],
+                'username' => $user['username'],
+                'pass' => $user['pass'],
+                'nome' => $user['nome'],
+                'email' => $user['email'],
+                'morada' => $user['morada'],
+                'roles' => [
+                    'admin' => $admin,
+                    'atleta' => $atleta,
+                    'treinador' => $treinador
+                ],
+                'treinadores' => $this->getAssociatedTreinadores($user['id']),
+                'atletas' => $this->getAssociatedAtletas($user['id'])
+            ]);
         }
 
 
         return $data;
     }
 
-    public function getUser($id): array{
+    public function getUser($id): array
+    {
         foreach ($this->db->utilizador()
-                                ->where('id', $id) as $user){
+            ->where('id', $id) as $user) {
             $admin = $this->isAdmin($user['id']);
             $atleta = $this->isAtleta($user['id']);
             $treinador = $this->isTreinador($user['id']);
 
             return [
                 'id' => $user['id'],
+                'atleta_id' => $this->db->atleta('utilizador_id = ?', $user['id'])->fetch()['id'],
+                'treinador_id' => $this->db->treinador('utilizador_id = ?', $user['id'])->fetch()['id'],
                 'username' => $user['username'],
                 'pass' => $user['pass'],
                 'nome' => $user['nome'],
@@ -63,9 +70,10 @@ class UserDAO extends Connection {
         }
     }
 
-    public function login($body){
-        foreach($this->db->utilizador()->where('username', $body['username']) as $user){
-            if($user['pass'] == $body['pass']){
+    public function login($body)
+    {
+        foreach ($this->db->utilizador()->where('username', $body['username']) as $user) {
+            if ($user['pass'] == $body['pass']) {
                 $token = bin2hex(openssl_random_pseudo_bytes(16));
 
                 $user->update(['access_token' => $token]);
@@ -76,71 +84,65 @@ class UserDAO extends Connection {
         return null;
     }
 
-    public function getUserByToken($token){
-        foreach($this->db->utilizador()->where('access_token', $token) as $user){
-            $admin = $this->isAdmin($user['id']);
-            $atleta = $this->isAtleta($user['id']);
-            $treinador = $this->isTreinador($user['id']);
+    public function getUserByToken($token)
+    {
+        $user = $this->db->utilizador('access_token = ?', $token)->fetch();
+         
+        $admin = $this->isAdmin($user['id']);
+        $atleta = $this->isAtleta($user['id']);
+        $treinador = $this->isTreinador($user['id']);
 
-            return [
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'pass' => $user['pass'],
-                'nome' => $user['nome'],
-                'email' => $user['email'],
-                'morada' => $user['morada'],
-                'roles' => [
-                    'admin' => $admin,
-                    'atleta' => $atleta,
-                    'treinador' => $treinador
-                ],
-                'treinadores' => $this->getAssociatedTreinadores($user['id']),
-                'atletas' => $this->getAssociatedAtletas($user['id'])
-            ];
-        }
-        
-        return null;
+        return [
+            'id' => $user['id'],
+            'atleta_id' => $this->db->atleta('utilizador_id = ?', $user['id'])->fetch()['id'],
+            'treinador_id' => $this->db->treinador('utilizador_id = ?', $user['id'])->fetch()['id'],
+            'username' => $user['username'],
+            'pass' => $user['pass'],
+            'nome' => $user['nome'],
+            'email' => $user['email'],
+            'morada' => $user['morada'],
+            'roles' => [
+                'admin' => $admin,
+                'atleta' => $atleta,
+                'treinador' => $treinador
+            ],
+            'treinadores' => $this->getAssociatedTreinadores($user['id']),
+            'atletas' => $this->getAssociatedAtletas($user['id'])
+        ];
     }
 
-    public function insert($user, $roles): bool{
+    public function insert($user, $roles): bool
+    {
         $id = $this->db->utilizador()->insert($user);
 
-        if(!$id) return false;
+        if (!$id) return false;
 
-        $this->db->administrador()->insert(['utilizador_id' => $id , 'active' => $roles['admin']]);
-        $this->db->atleta()->insert(['utilizador_id' => $id , 'active' => $roles['atleta']]);
-        $this->db->treinador()->insert(['utilizador_id' => $id , 'active' => $roles['treinador']]);
+        $this->db->administrador()->insert(['utilizador_id' => $id, 'active' => $roles['admin']]);
+        $this->db->atleta()->insert(['utilizador_id' => $id, 'active' => $roles['atleta']]);
+        $this->db->treinador()->insert(['utilizador_id' => $id, 'active' => $roles['treinador']]);
 
         return true;
     }
 
-    public function update($user, $roles){
+    public function update($user, $roles)
+    {
         $utilizador = $this->db->utilizador[$user['id']];
         $admin =  $this->db->administrador()->where('utilizador_id', $user['id']);
         $atleta = $this->db->atleta()->where('utilizador_id', $user['id']);
         $treinador =  $this->db->treinador()->where('utilizador_id', $user['id']);
 
-        if(!$utilizador) return false;
+        if (!$utilizador) return false;
 
-        $user['pass'] = $utilizador['pass'];
-
-        /*$body = [
-            'username' => $user['username'],
-            'pass' => $utilizador['pass'],
-            'nome' => $user['nome'],
-            'morada' => $user['morada'],
-            'email' => $user['email'],
-        ];
-*/
         $utilizador->update($user);
-        $admin->update(['active' => $roles['admin']]);
-        $atleta->update(['active' => $roles['atleta']]);
-        $treinador->update(['active' => $roles['treinador']]);
+        if(isset($roles['admin'])) $admin->update(['active' => $roles['admin']]);
+        if(isset($roles['atleta']))  $atleta->update(['active' => $roles['atleta']]);
+        if(isset($roles['treinador']))  $treinador->update(['active' => $roles['treinador']]);
 
         return true;
     }
 
-    public function delete($id): bool{
+    public function delete($id): bool
+    {
         $user = $this->db->utilizador[$id];
 
         $this->db->administrador()->where('utilizador_id', $id)->delete();
@@ -152,9 +154,10 @@ class UserDAO extends Connection {
         return $result;
     }
 
-    public function associate($data){
-        if(!$this->isAtleta($data['atleta_id']) || !$this->isTreinador($data['treinador_id'])) 
-                return false;
+    public function associate($data)
+    {
+        if (!$this->isAtleta($data['atleta_id']) || !$this->isTreinador($data['treinador_id']))
+            return false;
 
         $atleta = $this->getAtletaByUserID($data['atleta_id']);
         $treinador = $this->getTreinadorByUserID($data['treinador_id']);
@@ -168,7 +171,8 @@ class UserDAO extends Connection {
         return $result;
     }
 
-    public function dissociate($data){
+    public function dissociate($data)
+    {
         $atleta = $this->getAtletaByUserID($data['atleta_id']);
         $treinador = $this->getTreinadorByUserID($data['treinador_id']);
 
@@ -178,124 +182,132 @@ class UserDAO extends Connection {
         ];
 
         $result = $this->db->atletatreinador()
-                    ->where('treinador_id', $data['treinador_id'])
-                    ->and('atleta_id', $data['atleta_id'])->delete();
+            ->where('treinador_id', $data['treinador_id'])
+            ->and('atleta_id', $data['atleta_id'])->delete();
 
         return $result;
     }
 
-    public function getAssociatedTreinadores(int $id){
-        if(!$this->isAtleta($id)) return null;
-        
+    public function getAssociatedTreinadores(int $id)
+    {
+        if (!$this->isAtleta($id)) return null;
+
         $data = array();
 
-            $atleta_id = $this->getAtletaByUserID($id)['id'];
+        $atleta_id = $this->getAtletaByUserID($id)['id'];
 
-            foreach($this->db->atletatreinador()
+        foreach ($this->db->atletatreinador()
             ->where('atleta_id', $atleta_id) as $row) {
 
-                $treinador_id = $this->getTreinador($row['treinador_id'])['utilizador_id'];
+            $treinador_id = $this->getTreinador($row['treinador_id'])['utilizador_id'];
 
-                foreach ($this->db->utilizador()->where('id', $treinador_id) as $user){
-                    array_push($data,[
-                        'id' => $user['id'],
-                        'nome' => $user['nome']
-                    ]);
-                } 
+            foreach ($this->db->utilizador()->where('id', $treinador_id) as $user) {
+                array_push($data, [
+                    'id' => $user['id'],
+                    'nome' => $user['nome']
+                ]);
             }
+        }
 
 
         return $data;
     }
 
-    public function getAssociatedAtletas(int $id){
-        if(!$this->isTreinador($id)) return null;
-        
+    public function getAssociatedAtletas(int $id)
+    {
+        if (!$this->isTreinador($id)) return null;
+
         $data = array();
 
         $treinador_id = $this->getTreinadorByUserID($id)['id'];
 
-        foreach($this->db->atletatreinador()
-        ->where('treinador_id',$treinador_id) as $row){
+        foreach ($this->db->atletatreinador()
+            ->where('treinador_id', $treinador_id) as $row) {
 
             $atleta_id = $this->getAtleta($row['atleta_id'])['utilizador_id'];
-            
-                foreach ($this->db->utilizador()->where('id', $atleta_id) as $user){ //vai dar query ao utilizador
-                    array_push($data,[ //e puxar para o array data a informaçao
-                        'id' => $user['id'],
-                        'nome' => $user['nome']
-                    ]);
-                } 
 
+            foreach ($this->db->utilizador()->where('id', $atleta_id) as $user) { //vai dar query ao utilizador
+                array_push($data, [ //e puxar para o array data a informaçao
+                    'id' => $user['id'],
+                    'nome' => $user['nome']
+                ]);
+            }
         }
         return $data;
     }
 
-    public function isAdmin(int $id): bool {
-        foreach($this->db->administrador()->where('utilizador_id',$id) as $admin)
-            if($admin['active'])
+    public function isAdmin(int $id): bool
+    {
+        foreach ($this->db->administrador()->where('utilizador_id', $id) as $admin)
+            if ($admin['active'])
                 return true;
 
         return false;
     }
 
-    public function isAtleta(int $id): bool {
-        foreach($this->db->atleta()->where('utilizador_id',$id) as $atleta)
-                if($atleta['active'])
-                    return true;
-
-        return false;
-    }
-
-    public function isTreinador(int $id): bool {
-        foreach($this->db->treinador()->where('utilizador_id',$id) as $treinador)
-            if($treinador['active'])
+    public function isAtleta(int $id): bool
+    {
+        foreach ($this->db->atleta()->where('utilizador_id', $id) as $atleta)
+            if ($atleta['active'])
                 return true;
 
         return false;
     }
 
-    public function getAdmin(int $id){ 
+    public function isTreinador(int $id): bool
+    {
+        foreach ($this->db->treinador()->where('utilizador_id', $id) as $treinador)
+            if ($treinador['active'])
+                return true;
+
+        return false;
+    }
+
+    public function getAdmin(int $id)
+    {
         foreach ($this->db->administrador()
-                    ->where('id',$id) as $admin){
+            ->where('id', $id) as $admin) {
             return $admin;
         }
     }
 
-    public function getAtleta(int $id) { 
+    public function getAtleta(int $id)
+    {
         foreach ($this->db->atleta()
-                    ->where('id',$id) as $atleta){
+            ->where('id', $id) as $atleta) {
             return $atleta;
         }
     }
 
-    public function getTreinador(int $id){ 
+    public function getTreinador(int $id)
+    {
         foreach ($this->db->treinador()
-                    ->where('id',$id) as $treinador){
+            ->where('id', $id) as $treinador) {
             return $treinador;
         }
     }
 
-    public function getAdminByUserID(int $id){ //devolve atleta apartir do id de utilizador
+    public function getAdminByUserID(int $id)
+    { //devolve atleta apartir do id de utilizador
         foreach ($this->db->administrador()
-                    ->where('utilizador_id',$id) as $admin){
+            ->where('utilizador_id', $id) as $admin) {
             return $admin;
         }
     }
 
-    public function getAtletaByUserID(int $id) { //devolve atleta apartir do id de utilizador
+    public function getAtletaByUserID(int $id)
+    { //devolve atleta apartir do id de utilizador
         foreach ($this->db->atleta()
-                    ->where('utilizador_id',$id) as $atleta){
+            ->where('utilizador_id', $id) as $atleta) {
             return $atleta;
         }
     }
 
-    public function getTreinadorByUserID(int $id){ //devolve atleta apartir do id de utilizador
+    public function getTreinadorByUserID(int $id)
+    { //devolve atleta apartir do id de utilizador
         foreach ($this->db->treinador()
-                    ->where('utilizador_id',$id) as $treinador){
+            ->where('utilizador_id', $id) as $treinador) {
             return $treinador;
         }
     }
-
-    
 }

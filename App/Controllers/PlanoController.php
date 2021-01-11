@@ -85,6 +85,11 @@ final class PlanoController {
 
         $result = $planoDAO->update($fields); 
 
+        $response->getBody()->write(json_encode($result) , JSON_UNESCAPED_UNICODE);
+        return $response 
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(201);
+
         if($result){
             $response->getBody()->write(json_encode("Registo atualizado com sucesso") , JSON_UNESCAPED_UNICODE);
             return $response 
@@ -137,6 +142,27 @@ final class PlanoController {
             
         
         $response->getBody()->write(json_encode("Erro ao associar plano e atleta") , JSON_UNESCAPED_UNICODE);
+        return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(400);
+    }
+
+    public function dissociate(Request $request, Response $response, array $args): Response {
+        $planoDAO = new PlanoDAO();
+
+        $body = $request->getParsedBody(); 
+
+        $result = $planoDAO->dissociate($body);
+
+        if($result){
+            $response->getBody()->write(json_encode("Plano desassociado a atleta com sucesso") , JSON_UNESCAPED_UNICODE);
+            return $response 
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(201);
+        }
+            
+        
+        $response->getBody()->write(json_encode("Erro ao desassociar plano e atleta") , JSON_UNESCAPED_UNICODE);
         return $response 
                 ->withHeader('Content-Type', 'application/json')
                 ->withStatus(400);
@@ -296,7 +322,7 @@ final class PlanoController {
 
         $body = $request->getParsedBody();
 
-        $result = $planoDAO->duplicate($body['id']);
+        $result = $planoDAO->duplicate($body);
 
         $response->getBody()->write(json_encode($result) , JSON_UNESCAPED_UNICODE);
         return $response 

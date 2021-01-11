@@ -7,6 +7,7 @@ CREATE TABLE utilizador (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100),
     morada VARCHAR(100),
+    access_token VARCHAR(32),
     PRIMARY KEY (id)
 );
 
@@ -121,3 +122,13 @@ CREATE TABLE blocoExercicio (
         FOREIGN KEY (exercicio_id)
             REFERENCES exercicio(id)
 );
+
+INSERT INTO `utilizador` (`id`, `username`, `pass`, `nome`, `email`, `morada`, `access_token`) VALUES (NULL, 'root', 'root', 'root', NULL, NULL, NULL);
+INSERT INTO `treinador` (`id`, `utilizador_id`, `active`) VALUES (NULL, '1', '1');
+INSERT INTO `atleta` (`id`, `utilizador_id`, `active`) VALUES (NULL, '1', '1');
+INSERT INTO `administrador` (`id`, `utilizador_id`, `active`) VALUES (NULL, '1', '1');
+
+INSERT INTO `tipoexercicio` (`id`, `nome`, `descricao`) VALUES 
+    (NULL, 'Resistência aeróbica - Cardio', ''), 
+    (NULL, 'Resistência muscular - Musculação', NULL), 
+    (NULL, 'Alongamento', NULL);

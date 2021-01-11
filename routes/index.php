@@ -50,6 +50,7 @@ $app->group('/plano', function() use($app){
         $app->get('/{id}/atletas', PlanoController::class . ':atletasAssociadosPlano');
         $app->post('/', PlanoController::class . ':create');
         $app->post('/associate', PlanoController::class . ':associate');
+        $app->post('/dissociate', PlanoController::class . ':dissociate');
         $app->post('/{id}/add', PlanoController::class . ':addExercise');
         $app->post('/duplicate', PlanoController::class . ':duplicate');
 
