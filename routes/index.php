@@ -34,35 +34,35 @@ $app->group('/user', function() use ($app){
 //plano
 $app->group('/plano', function() use($app){
 
-    $app->get('/{id}/bloco/{dia}', PlanoController::class . ':showBloco');
+    $app->get('/{id}/bloco/{dia}', PlanoController::class . ':showBloco');//
 
     //atletas/admins
     $app->group('', function () use ($app){
-        $app->get('/atleta/{id}', PlanoController::class . ':planosAtleta');
+        $app->get('/atleta/{id}', PlanoController::class . ':planosAtleta'); //
 
     })->add(AuthMiddleware::class . ':isAtleta');
 
 
     //treinadores/admins
     $app->group('', function() use ($app){
-        $app->get('/{id}', PlanoController::class . ':show');
-        $app->get('/treinador/{id}', PlanoController::class . ':planosTreinador');
-        $app->get('/{id}/atletas', PlanoController::class . ':atletasAssociadosPlano');
-        $app->post('/', PlanoController::class . ':create');
-        $app->post('/associate', PlanoController::class . ':associate');
-        $app->post('/dissociate', PlanoController::class . ':dissociate');
-        $app->post('/{id}/add', PlanoController::class . ':addExercise');
+        $app->get('/{id}', PlanoController::class . ':show');//
+        $app->get('/treinador/{id}', PlanoController::class . ':planosTreinador');//
+        $app->get('/{id}/atletas', PlanoController::class . ':atletasAssociadosPlano');//
+        $app->post('/', PlanoController::class . ':create');//
+        $app->post('/associate', PlanoController::class . ':associate');//
+        $app->post('/dissociate', PlanoController::class . ':dissociate');//
+        $app->post('/{id}/add', PlanoController::class . ':addExercise');//
         $app->post('/duplicate', PlanoController::class . ':duplicate');
 
-        $app->put('/{id}', PlanoController::class . ':update');
-        $app->delete('/{id}', PlanoController::class . ':delete');
-        $app->delete('/blocoexercicio/{bloco}/{exercicio}', PlanoController::class . ':deleteExercise');
+        $app->put('/{id}', PlanoController::class . ':update');//
+        $app->delete('/{id}', PlanoController::class . ':delete');//
+        $app->delete('/blocoexercicio/{bloco}/{exercicio}', PlanoController::class . ':deleteExercise');//
     })->add(AuthMiddleware::class . ':isTreinador');
 
 
     //admins
     $app->group('',function() use($app){
-        $app->get('/', PlanoController::class . ':index');
+        $app->get('/', PlanoController::class . ':index');//
 
     })->add(AuthMiddleware::class . ':isAdmin');
 });

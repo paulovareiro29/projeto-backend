@@ -72,8 +72,9 @@ class UserDAO extends Connection
 
     public function login($body)
     {
+
         foreach ($this->db->utilizador()->where('username', $body['username']) as $user) {
-            if ($user['pass'] == $body['pass']) {
+            if (password_verify($body['pass'], $user['pass'])) {
                 $token = bin2hex(openssl_random_pseudo_bytes(16));
 
                 $user->update(['access_token' => $token]);
@@ -87,7 +88,10 @@ class UserDAO extends Connection
     public function getUserByToken($token)
     {
         $user = $this->db->utilizador('access_token = ?', $token)->fetch();
-         
+        if(!$user){
+            return null;
+        }
+
         $admin = $this->isAdmin($user['id']);
         $atleta = $this->isAtleta($user['id']);
         $treinador = $this->isTreinador($user['id']);
@@ -113,6 +117,10 @@ class UserDAO extends Connection
 
     public function insert($user, $roles): bool
     {
+        if(isset($user['pass'])){
+            $user['pass'] = password_hash($user['pass'],PASSWORD_BCRYPT);
+        }
+
         $id = $this->db->utilizador()->insert($user);
 
         if (!$id) return false;
@@ -126,6 +134,10 @@ class UserDAO extends Connection
 
     public function update($user, $roles)
     {
+        if(isset($user['pass'])){
+            $user['pass'] = password_hash($user['pass'],PASSWORD_BCRYPT);
+        }
+
         $utilizador = $this->db->utilizador[$user['id']];
         $admin =  $this->db->administrador()->where('utilizador_id', $user['id']);
         $atleta = $this->db->atleta()->where('utilizador_id', $user['id']);
