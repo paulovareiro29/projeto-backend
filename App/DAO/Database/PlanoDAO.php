@@ -152,6 +152,12 @@ class PlanoDAO extends Connection
 
         $this->db->planoatleta()->where('plano_id', $id)->delete();
 
+        foreach($this->db->bloco()->where('plano_id',$id) as $bloco){
+            $this->db->blocoexercicio()->where('bloco_id',$bloco['id'])->delete();
+            $bloco->delete();
+        }
+
+
         $result = $this->db->plano()->where('id', $id)->delete();
 
         return $result;

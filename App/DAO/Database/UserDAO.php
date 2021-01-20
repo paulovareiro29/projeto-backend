@@ -117,6 +117,13 @@ class UserDAO extends Connection
 
     public function insert($user, $roles): bool
     {
+
+        if(!isset($user['pass']) || !isset($user['username'])) return false;
+
+        if($this->db->utilizador()->where('username',$user['username'])->fetch()) return false;
+
+        
+
         if(isset($user['pass'])){
             $user['pass'] = password_hash($user['pass'],PASSWORD_BCRYPT);
         }
