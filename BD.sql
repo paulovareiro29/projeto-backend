@@ -123,7 +123,7 @@ CREATE TABLE blocoExercicio (
             REFERENCES exercicio(id)
 );
 
-INSERT INTO `utilizador` (`id`, `username`, `pass`, `nome`, `email`, `morada`, `access_token`) VALUES (NULL, 'root', 'root', 'root', NULL, NULL, NULL);
+INSERT INTO `utilizador` (`id`, `username`, `pass`, `nome`, `email`, `morada`, `access_token`) VALUES (NULL, 'root', '$2y$10$4zMeevKcwwkFevEBcRklEOHiCsJS3WmVioVp9z0QHF2uEzGYlKqyW', 'root', NULL, NULL, NULL);
 INSERT INTO `treinador` (`id`, `utilizador_id`, `active`) VALUES (NULL, '1', '1');
 INSERT INTO `atleta` (`id`, `utilizador_id`, `active`) VALUES (NULL, '1', '1');
 INSERT INTO `administrador` (`id`, `utilizador_id`, `active`) VALUES (NULL, '1', '1');
